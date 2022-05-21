@@ -95,7 +95,6 @@ public abstract class MobEntityMixin extends LivingEntityMixin implements MobEnt
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void arclight$init(EntityType<? extends MobEntity> type, World worldIn, CallbackInfo ci) {
-        this.persistenceRequired = !this.canDespawn(0.0);
         this.aware = true;
     }
 
@@ -188,11 +187,6 @@ public abstract class MobEntityMixin extends LivingEntityMixin implements MobEnt
         if (canPickup) mobEntity.setCanPickUpLoot(true);
     }
 
-    @Redirect(method = "readAdditional", at = @At(value = "INVOKE", ordinal = 1, target = "Lnet/minecraft/nbt/CompoundNBT;getBoolean(Ljava/lang/String;)Z"))
-    public boolean arclight$setIfTrue(CompoundNBT nbt, String key) {
-        return nbt.getBoolean(key) || this.persistenceRequired;
-    }
-
     @Inject(method = "updateEntityActionState", cancellable = true, at = @At("HEAD"))
     private void arclight$unaware(CallbackInfo ci) {
         if (!this.aware) {
@@ -242,11 +236,6 @@ public abstract class MobEntityMixin extends LivingEntityMixin implements MobEnt
         } else {
             return false;
         }
-    }
-
-    @Redirect(method = "checkDespawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/MobEntity;canDespawn(D)Z"))
-    public boolean arclight$checkDespawn(MobEntity mobEntity, double distanceToClosestPlayer) {
-        return true;
     }
 
     @Inject(method = "processInitialInteract", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/MobEntity;clearLeashed(ZZ)V"))
